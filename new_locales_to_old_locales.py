@@ -14,6 +14,7 @@ Written by Mighty_Condor
 '''
 import json
 import os
+import shutil
 
 
 def main():
@@ -83,6 +84,7 @@ def main():
         
     #print(finalDict["en.json"])
 
+    if os.path.exists("output"): shutil.rmtree("output")
     os.mkdir("output")
     outputDirectory = directory + "\\output"
 
