@@ -46,9 +46,9 @@ Script to manually add locale entries to every locale instead of copy pasting a 
 
 Script to change locale format from new single-line 3.4.X and newer format to old multi-line format. (Why would you want to do this? Only reason I made it was for backwards-compatibility for the gun mods. Don't know if there is any other reason)
 
-### old_locales_to_new_locales.py (INCOMPLETE)
+### old_locales_to_new_locales.py
 
-Unfortunately not finished script to convert a folder of old locale format jsons to a folder of new locale format jsons.
+Script to change locale format from old pre-3.4 format to new single-line format post-3.4 SPT. Changes a folder with how ever many locale json files you want.
 
 ### remove_files_from_folders.py
 
