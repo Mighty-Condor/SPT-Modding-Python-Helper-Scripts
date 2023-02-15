@@ -13,42 +13,89 @@ Written by Mighty_Condor
 import json
 import os
 
+def main():
 
-print("\n\nThis script takes a folder that is filled with locale .json files and transforms them to make them follow the new locale format.\n\n")
+    print("\n\nThis script takes a folder that is filled with locale .json files and transforms them to make them follow the new locale format.\n\n")
+    print("WARNING: I highly recommend you make a copy of the things you are trying to convert BEFORE running this script on them! Don't be an idiot, just do it.\n\n")
 
-print("WARNING: I highly recommend you make a copy of the things you are trying to convert BEFORE running this script on them! Don't be an idiot, just do it.\n\n")
+    input("Go do that if you haven't already, then press any key to continue.\n\n")
 
-input("Go do that if you haven't already, then press any key to continue.\n\n")
+    directory = getDirectory("Enter the folder with all the locale .jsons inside it. Drag and drop or enter the path here: ")
 
-directory = input("Enter the folder with all the locale .jsons inside it. Drag and drop or enter the path here: ")
+    input("Press any key to try converting.\n\n")
+        
+    dirList = [f for f in os.listdir(directory) if (os.path.isfile(f) and f.endswith(".json"))]
 
-try: directory = directory.replace('"', '')
-except:
-    print("There was an error fixing the directory path")
-    input("Press any key to exit")
-    exit()
-    
-print("\n\nDirectory: ", directory, "\n\n")
+    print("Files found:\n\n")
+    print(dirList, "\n\n")
 
-try: os.chdir(directory)
-except:
-    print("There was an error navigating to that directory")
-    input("Press any key to exit")
-    exit()
+    locale_data = {}
 
-input("Directory found! Press any key to try converting.")
-    
-dirList = [f for f in os.listdir(directory) if os.path.isfile(f)]
+    for locale in dirList:
 
-print("Files found:\n\n")
-print(dirList)
+        locale_file = open(locale, encoding='utf-8')
+        locale_data[locale] = json.load(locale_file)
+        locale_file.close()
 
-pathList = [directory + "\\" + s for s in dirList]
+    finalDict = {}
+    for locale in locale_data:
 
-locale_data = {}
+        finalDict[locale] = {}
 
-for locale in dirList:
-    
-    #print(locale)
-    locale_file = open(locale, encoding='utf-8')
-    locale_data[locale] = json.load(locale_file)
+        for template in locale_data[locale]["templates"]:
+
+            finalDict[locale][template + " Name"] =         locale_data[locale]["templates"][template]["Name"]
+            finalDict[locale][template + " ShortName"] =    locale_data[locale]["templates"][template]["ShortName"]
+            finalDict[locale][template + " Description"] =  locale_data[locale]["templates"][template]["Description"]
+        
+        for preset in locale_data[locale]["preset"]:
+
+            finalDict[locale][preset] = locale_data[locale]["preset"][preset]["Name"]
+        
+    #print(finalDict["en.json"])
+
+    os.mkdir("output")
+    outputDirectory = directory + "\\output"
+
+    f = {}
+    for locale in dirList:
+        f[locale] = open(outputDirectory + "\\" + locale, "w", encoding='utf-8')
+        json.dump(finalDict[locale], f[locale], ensure_ascii=False, indent=4)
+        f[locale].close()
+
+
+def error(errorString, fatal) :
+
+    print("\n\n\nERROR: " + errorString, "\n\n\n")
+    if (fatal):
+        input("Press any key to exit")
+        exit()
+    else:
+        input("Press any key to continue, or exit manually by closing the window or CTRL+C now.")
+
+def getDirectory(prompt):
+
+    directory = input(prompt)
+
+    try: 
+        directory = os.path.normpath(directory)
+        directory = directory.replace('"', '')
+    except: error("There was an error fixing the directory path", 1)
+
+    print("\n\nDirectory: ", directory, "\n\n")
+
+    try: os.path.exists(directory)
+    except: error("Directory does not exist at that path.", 1)
+    print("Directory found!\n\n")
+
+    os.chdir(directory)
+
+    dirList = os.listdir(directory)
+
+    print("Found directory contents:\n\n")
+    print(dirList, "\n\n")
+
+    return directory
+
+
+if __name__ == '__main__': main()
