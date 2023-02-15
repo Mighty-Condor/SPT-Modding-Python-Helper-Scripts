@@ -38,7 +38,9 @@ def main():
         "raiders": {},
         "cultistPriest": {},
         "cultistFollowers": {},
-        "usec": {}
+        "usec": {},
+        "zryachiy": {},
+        "zryachiyFollowers": {}
     }
 
     for botType in defaults:

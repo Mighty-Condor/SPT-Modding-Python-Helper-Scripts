@@ -30,10 +30,8 @@ def main():
 
         easy_bot_type = translate(bot_type)
 
-        if ( easy_bot_type == None ):
-            continue
-        else:
-            bot_types[easy_bot_type] = json.load(open(bot_type, encoding='utf-8'))
+        if ( easy_bot_type == None ): continue
+        else: bot_types[easy_bot_type] = json.load(open(bot_type, encoding='utf-8'))
 
     #print(bot_types["normalScavs"]["difficulty"]["easy"]["Mind"], "\n\n")
 
@@ -148,12 +146,13 @@ def translate(filename):
         "sectantpriest.json":           "cultistPriest",
         "sectantwarrior.json":          "cultistFollowers",
         "pmcbot.json":                  "raiders",
-        "exusec.json":                  "rogues"
+        "exusec.json":                  "rogues",
+        "bosszryachiy.json":            "zryachiy",
+        "followerzryachiy.json":        "zryachiyFollowers"
     }
 
     if filename in translationDict: return translationDict[filename]
     else: return None
 
 
-if __name__ == '__main__':
-    main()
+if __name__ == '__main__': main()
