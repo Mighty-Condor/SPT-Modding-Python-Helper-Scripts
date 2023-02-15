@@ -15,98 +15,115 @@ Written by Mighty_Condor
 import json
 import os
 
-print("\n\nThis script takes a folder that is filled with locale .json files and transforms them to make them follow the old locale format.\n\n")
 
-print("WARNING: I highly recommend you make a copy of the things you are trying to convert BEFORE running this script on them! Don't be an idiot, just do it.\n\n")
+def main():
 
-input("Go do that if you haven't already, then press any key to continue.\n\n")
+    print("\n\nThis script takes a folder that is filled with locale .json files and transforms them to make them follow the old locale format.\n\n")
+    print("WARNING: I highly recommend you make a copy of the things you are trying to convert BEFORE running this script on them! Don't be an idiot, just do it.\n\n")
 
-directory = input("Enter the folder with all the locale .jsons inside it. Drag and drop or enter the path here: ")
+    input("Go do that if you haven't already, then press any key to continue.\n\n")
 
-try: directory = directory.replace('"', '')
-except:
-    print("There was an error fixing the directory path")
-    input("Press any key to exit")
-    exit()
-    
-print("\n\nDirectory: ", directory, "\n\n")
+    directory = getDirectory("Enter the folder with all the locale .jsons inside it. Drag and drop or enter the path here: ")
 
-try: os.chdir(directory)
-except:
-    print("There was an error navigating to that directory")
-    input("Press any key to exit")
-    exit()
+    input("Press any key to try converting.\n\n")
 
-input("Directory found! Press any key to try converting.")
+    #Make a list of the json files only inside the given directly
+    dirList = [f for f in os.listdir(directory) if (os.path.isfile(f) and f.endswith(".json"))]
 
-dirList = [f for f in os.listdir(directory) if os.path.isfile(f)]
+    print("Files found:\n\n")
+    print(dirList, "\n\n")
 
-print("Files found:\n\n")
-print(dirList)
+    #Load all the given locale files into a single dictionary locale_data
+    locale_data = {}
+    for locale in dirList:
 
-pathList = [directory + "\\" + s for s in dirList]
-#print(pathList)
+        locale_file = open(locale, encoding='utf-8')
+        locale_data[locale] = json.load(locale_file)
+        locale_file.close()
 
-locale_data = {}
+    finalDict = {}
+    for locale in locale_data:
 
-for locale in dirList:
-    
-    #print(locale)
-    locale_file = open(locale, encoding='utf-8')
-    locale_data[locale] = json.load(locale_file)
+        finalDict[locale] = {
+            "templates": {},
+            "preset": {}
+        }
 
-finalDict = {}
-    
-for locale in locale_data:
-
-    finalDict[locale] = {
-        "templates": {},
-        "preset": {}
-    }
-    #print(locale)
-
-    for entry in locale_data[locale]:
-    
-        key = entry
-        value = locale_data[locale][entry]
+        for entry in locale_data[locale]:
         
-        if (key.find(" Name") > 0): 
-            nameKey = key.replace(" Name", "")
-            #print("nameKey: " + nameKey)
-            finalDict[locale]["templates"][nameKey] = {
-                "Name": value,
-                "ShortName": "",
-                "Description": ""
-            }
+            key = entry
+            value = locale_data[locale][entry]
             
-        elif (key.find(" ShortName") > 0): 
-            shortNameKey = key.replace(" ShortName", "")
-            #print("shortNameKey: " + shortNameKey)
-            finalDict[locale]["templates"][shortNameKey]["ShortName"] = value
-            
-        elif (key.find(" Description") > 0): 
-            descriptionKey = key.replace(" Description", "")
-            #print("descriptionKey: " + descriptionKey)
-            finalDict[locale]["templates"][descriptionKey]["Description"] = value
-            
-        else: 
-            presetKey = key
-            #print("presetKey: " + presetKey)
-            finalDict[locale]["preset"][presetKey] = {
-                "Name": value
-            }
-    
-    #print(finalDict[locale])
+            #Sort each key by name, shortname, description, otherwise it is a preset
+            if (key.find(" Name") > 0): 
+                nameKey = key.replace(" Name", "")
+                #print("nameKey: " + nameKey)
+                finalDict[locale]["templates"][nameKey] = {
+                    "Name": value,
+                    "ShortName": "",
+                    "Description": ""
+                }
+                
+            elif (key.find(" ShortName") > 0): 
+                shortNameKey = key.replace(" ShortName", "")
+                #print("shortNameKey: " + shortNameKey)
+                finalDict[locale]["templates"][shortNameKey]["ShortName"] = value
+                
+            elif (key.find(" Description") > 0): 
+                descriptionKey = key.replace(" Description", "")
+                #print("descriptionKey: " + descriptionKey)
+                finalDict[locale]["templates"][descriptionKey]["Description"] = value
+                
+            else: 
+                presetKey = key
+                #print("presetKey: " + presetKey)
+                finalDict[locale]["preset"][presetKey] = {
+                    "Name": value
+                }
         
-    #print(locale_data[locale]["62e7c4fba689e8c9c50dfc38 Name"])
-    
-#print(finalDict["en.json"])
+    #print(finalDict["en.json"])
 
-os.mkdir("output")
-outputDirectory = directory + "\\output"
-#print(outputDirectory)
+    os.mkdir("output")
+    outputDirectory = directory + "\\output"
 
-f = {}
-for locale in dirList:
-    f[locale] = open(outputDirectory + "\\" + locale, "w", encoding='utf-8')
-    json.dump(finalDict[locale], f[locale], ensure_ascii=False, indent=4)
+    f = {}
+    for locale in dirList:
+        f[locale] = open(outputDirectory + "\\" + locale, "w", encoding='utf-8')
+        json.dump(finalDict[locale], f[locale], ensure_ascii=False, indent=4)
+        f[locale].close()
+
+
+def error(errorString, fatal) :
+
+    print("\n\n\nERROR: " + errorString, "\n\n\n")
+    if (fatal):
+        input("Press any key to exit")
+        exit()
+    else:
+        input("Press any key to continue, or exit manually by closing the window or CTRL+C now.")
+
+def getDirectory(prompt):
+
+    directory = input(prompt)
+
+    try: 
+        directory = os.path.normpath(directory)
+        directory = directory.replace('"', '')
+    except: error("There was an error fixing the directory path", 1)
+
+    print("\n\nDirectory: ", directory, "\n\n")
+
+    try: os.path.exists(directory)
+    except: error("Directory does not exist at that path.", 1)
+    print("Directory found!\n\n")
+
+    os.chdir(directory)
+
+    dirList = os.listdir(directory)
+
+    print("Found directory contents:\n\n")
+    print(dirList, "\n\n")
+
+    return directory
+
+if __name__ == '__main__': main()
