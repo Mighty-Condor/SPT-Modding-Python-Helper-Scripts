@@ -50,10 +50,10 @@ def main():
             finalDict[bot_type][difficulty] = {}
 
             if "CAN_TALK" in mind: finalDict[bot_type][difficulty]["CAN_TALK"] = mind["CAN_TALK"]
-            else: finalDict[bot_type][difficulty]["CAN_TALK"] = None
+            else: finalDict[bot_type][difficulty]["CAN_TALK"] = True
 
             if "TALK_WITH_QUERY" in mind: finalDict[bot_type][difficulty]["TALK_WITH_QUERY"] = mind["TALK_WITH_QUERY"]
-            else: finalDict[bot_type][difficulty]["TALK_WITH_QUERY"] = None
+            else: finalDict[bot_type][difficulty]["TALK_WITH_QUERY"] = True
 
             if "GROUP_ANY_PHRASE_DELAY" in mind: finalDict[bot_type][difficulty]["GROUP_ANY_PHRASE_DELAY"] = mind["GROUP_ANY_PHRASE_DELAY"]
             else: finalDict[bot_type][difficulty]["GROUP_ANY_PHRASE_DELAY"] = None
@@ -77,7 +77,10 @@ def main():
             else: finalDict[bot_type][difficulty]["MIN_DIST_TO_CLOSE_TALK_SQR"] = None
 
             if "CHANCE_TO_NOTIFY_ENEMY_GR_100" in grenade: finalDict[bot_type][difficulty]["CHANCE_TO_NOTIFY_ENEMY_GR_100"] = grenade["CHANCE_TO_NOTIFY_ENEMY_GR_100"]
-            else: finalDict[bot_type][difficulty]["CHANCE_TO_NOTIFY_ENEMY_GR_100"] = None            
+            else: finalDict[bot_type][difficulty]["CHANCE_TO_NOTIFY_ENEMY_GR_100"] = None     
+
+            if "CHANCE_TO_PLAY_VOICE_WHEN_CLOSE" in patrol: finalDict[bot_type][difficulty]["CHANCE_TO_PLAY_VOICE_WHEN_CLOSE"] = patrol["CHANCE_TO_PLAY_VOICE_WHEN_CLOSE"]
+            else: finalDict[bot_type][difficulty]["CHANCE_TO_PLAY_VOICE_WHEN_CLOSE"] = 50 
 
 
     #print(finalDict, "\n\n")
