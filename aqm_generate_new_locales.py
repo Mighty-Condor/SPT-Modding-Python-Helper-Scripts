@@ -26,9 +26,64 @@ def main():
 
     print(db["locales"]["en"]["trading"]["Bashkir_Temporal_Id.json"], "\n\n")
 
-    #Do important stuff here
+    #Quest Bundles - Change locales from mail + quest to new format
+    QuestBundlesOUT = {}
 
-    outputDatabase(db)
+    for bundle in db["QuestBundles"]:
+
+        QuestBundlesOUT[bundle] = {}
+
+        for trader in db["QuestBundles"][bundle]:
+
+            QuestBundlesOUT[bundle][trader] = {}
+            QuestBundlesOUT[bundle][trader]["locales"] = {}
+            QuestBundlesOUT[bundle][trader]["quests.json"] = db["QuestBundles"][bundle][trader]["quests.json"]
+
+            for locale in db["QuestBundles"][bundle][trader]["locales"]:
+
+                mail = db["QuestBundles"][bundle][trader]["locales"][locale]["mail.json"]
+                quest = db["QuestBundles"][bundle][trader]["locales"][locale]["quest.json"]
+
+                QuestBundlesOUT[bundle][trader]["locales"][locale + ".json"] = {}
+                localeOUT = QuestBundlesOUT[bundle][trader]["locales"][locale + ".json"]
+
+                for questID in quest:
+
+                    localeOUT[questID + " name"] = quest[questID]["name"]
+                    localeOUT[questID + " note"] = quest[questID]["note"]
+                    localeOUT[questID + " description"] = mail[questID + "_Description"]
+                    localeOUT[questID + " startedMessageText"] = mail[questID + "_Started"]
+                    localeOUT[questID + " failMessageText"] = mail[questID + "_Fail"]
+                    localeOUT[questID + " successMessageText"] = mail[questID + "_Success"]
+                    localeOUT[questID + " acceptPlayerMessage"] = ""
+                    localeOUT[questID + " declinePlayerMessage"] = ""
+                    localeOUT[questID + " completePlayerMessage"] = ""
+
+    print(QuestBundlesOUT["Ammo Proficiency"]["Bashkir_Temporal_Id"]["locales"]["en.json"], "\n\n")
+
+    localesOUT = {}
+
+    for locale in db["locales"]:
+
+        localesOUT[locale] = {}
+        localesOUT[locale]["trading"] = {}
+
+        for trader in db["locales"][locale]["trading"]:
+
+            localesOUT[locale]["trading"][trader] = {}
+
+            for entry in db["locales"][locale]["trading"][trader]:
+
+                traderIdOnly = trader.replace(".json", "")
+
+                localesOUT[locale]["trading"][trader][traderIdOnly + " " + entry] = db["locales"][locale]["trading"][trader][entry]
+
+    databaseOUT = {
+        "locales": localesOUT,
+        "QuestBundles": QuestBundlesOUT
+    }
+
+    outputDatabase(databaseOUT, "D:\\Desktop\\output\\", True)
 
     input("Press any key to exit\n")
 
@@ -84,10 +139,23 @@ def getDatabase(directory):
     
     return database
 
-def outputDatabase(database, outputPath="D:\\Desktop\\output\\"):
+def outputDatabase(database, outputPath, initial=False):
 
-    if os.path.exists(outputPath): shutil.rmtree(outputPath)
-    os.mkdir(outputPath)
+    if initial:
+        if os.path.exists(outputPath): shutil.rmtree(outputPath)
+        os.mkdir(outputPath)
+
+    for entry in database:
+
+        if entry.endswith(".json"):
+
+            outputFile = open(outputPath + entry, "w", encoding='utf-8')
+            json.dump(database[entry], outputFile, ensure_ascii=False, indent=4)
+            outputFile.close()
+
+        else:
+            os.mkdir(outputPath + entry + "\\")
+            outputDatabase(database[entry], outputPath + entry + "\\")
 
 def getAllJsonFiles(directory):
 
