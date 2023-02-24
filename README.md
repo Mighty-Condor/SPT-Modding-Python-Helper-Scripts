@@ -10,6 +10,11 @@ Python scripts used by me to help automate certain SPT modding tasks.
 
 Summary of each script's intended use:
 
+
+### aqm_generate_new_locales.py
+
+Specifically made for Andrudis-QuestManiac in order to update the necessary locale json files for it to work again. There is not really any general use for this I don't think.
+
 ### compare_items_files.py
 
 Load two items.json type files and print to console a list of IDs that are in the second file but not the first. Can be used to extract all new keys in items.json if you enter the old items.json as the first file and the new items.json as the second file. Only works one way.
@@ -57,3 +62,7 @@ This script takes a folder that is filled with other folders that have files in 
 ### search_all_jsons_for_string.py
 
 Intended to search an SPT install's database folder and all jsons nested inside it for a string match. Change the string by editing the python file or edit the python file to input the string some other way. Please be careful with this one as it is recursive and only tested on the SPT database folder. Could cause PC problems if you use it on some other folder.
+
+### translate_english_locale.py
+
+Experimental script to automatically translate (based on google translator I believe) an english locale file to all the other locales. This will probably not work sadly.
