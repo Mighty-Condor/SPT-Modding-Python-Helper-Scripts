@@ -59,7 +59,10 @@ def main():
                     localeOUT[questID + " declinePlayerMessage"] = ""
                     localeOUT[questID + " completePlayerMessage"] = ""
 
-    print(QuestBundlesOUT["Ammo Proficiency"]["Bashkir_Temporal_Id"]["locales"]["en.json"], "\n\n")
+                    for condition in quest[questID]["conditions"]:
+                        localeOUT[condition] = quest[questID]["conditions"][condition]
+
+    #print(QuestBundlesOUT["Ammo Proficiency"]["Bashkir_Temporal_Id"]["locales"]["en.json"], "\n\n")
 
     localesOUT = {}
 
