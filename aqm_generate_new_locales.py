@@ -39,6 +39,15 @@ def main():
             QuestBundlesOUT[bundle][trader]["locales"] = {}
             QuestBundlesOUT[bundle][trader]["quests.json"] = db["QuestBundles"][bundle][trader]["quests.json"]
 
+            quests = QuestBundlesOUT[bundle][trader]["quests.json"]
+            for quest in quests:
+                quests[quest]["QuestName"] = db["QuestBundles"][bundle][trader]["locales"]["en"]["quest.json"][quest]["name"]
+                quests[quest]["acceptPlayerMessage"] = quest + " acceptPlayerMessage"
+                quests[quest]["changeQuestMessageText"] = quest + " changeQuestMessageText"
+                quests[quest]["completePlayerMessage"] = quest + " completePlayerMessage"
+                quests[quest]["side"] = "Pmc"
+                if quests[quest]["location"] == "5714dc342459777137212e0b": quests[quest]["location"] = "any"
+
             for locale in db["QuestBundles"][bundle][trader]["locales"]:
 
                 mail = db["QuestBundles"][bundle][trader]["locales"][locale]["mail.json"]
