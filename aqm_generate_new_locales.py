@@ -1,7 +1,7 @@
 '''
 Python script made specifically for the mod "Andrudis QuestManiac" (AQM) to change a bunch of old locale files to the new locale format.
 
-Input: Drag and drop the "db" folder from AQM.
+Input: Drag and drop the whole AQM folder.
 
 Output: Custom output folder structure based on AQM with all the properly formatted files.
 
@@ -16,83 +16,38 @@ import shutil
 
 def main():
 
-    print("\n\nThis script takes the Andrudis QuestManiac (AQM) \"db\" folder and generates new json files that follow the new locale format.\n\n")
+    print("\n\nThis script takes the Andrudis QuestManiac (AQM) folder and generates new json files that follow the new locale format.\n\n")
 
-    directory = getDirectory("Enter the \"db\" folder from AQM. Drag and drop or enter the path here: ")
+    directory = getDirectory("Enter the AQM folder. Drag and drop or enter the path here: ")
 
     input("Press any key to try converting.\n\n")
 
-    db = getDatabase(directory)
+    aqmData = getDatabase(directory)
 
-    print(db["locales"]["en"]["trading"]["Bashkir_Temporal_Id.json"], "\n\n")
+    #print(aqmData["db"]["locales"]["en"]["trading"]["Bashkir_Temporal_Id.json"], "\n\n")
 
-    #Quest Bundles - Change locales from mail + quest to new format
-    QuestBundlesOUT = {}
-
-    for bundle in db["QuestBundles"]:
-
-        QuestBundlesOUT[bundle] = {}
-
-        for trader in db["QuestBundles"][bundle]:
-
-            QuestBundlesOUT[bundle][trader] = {}
-            QuestBundlesOUT[bundle][trader]["locales"] = {}
-            QuestBundlesOUT[bundle][trader]["quests.json"] = db["QuestBundles"][bundle][trader]["quests.json"]
-
-            quests = QuestBundlesOUT[bundle][trader]["quests.json"]
-            for quest in quests:
-                quests[quest]["QuestName"] = db["QuestBundles"][bundle][trader]["locales"]["en"]["quest.json"][quest]["name"]
-                quests[quest]["acceptPlayerMessage"] = quest + " acceptPlayerMessage"
-                quests[quest]["changeQuestMessageText"] = quest + " changeQuestMessageText"
-                quests[quest]["completePlayerMessage"] = quest + " completePlayerMessage"
-                quests[quest]["side"] = "Pmc"
-                if quests[quest]["location"] == "5714dc342459777137212e0b": quests[quest]["location"] = "any"
-
-            for locale in db["QuestBundles"][bundle][trader]["locales"]:
-
-                mail = db["QuestBundles"][bundle][trader]["locales"][locale]["mail.json"]
-                quest = db["QuestBundles"][bundle][trader]["locales"][locale]["quest.json"]
-
-                QuestBundlesOUT[bundle][trader]["locales"][locale + ".json"] = {}
-                localeOUT = QuestBundlesOUT[bundle][trader]["locales"][locale + ".json"]
-
-                for questID in quest:
-
-                    localeOUT[questID + " name"] = quest[questID]["name"]
-                    localeOUT[questID + " note"] = quest[questID]["note"]
-                    localeOUT[questID + " description"] = mail[questID + "_Description"]
-                    localeOUT[questID + " startedMessageText"] = mail[questID + "_Started"]
-                    localeOUT[questID + " failMessageText"] = mail[questID + "_Fail"]
-                    localeOUT[questID + " successMessageText"] = mail[questID + "_Success"]
-                    localeOUT[questID + " acceptPlayerMessage"] = ""
-                    localeOUT[questID + " declinePlayerMessage"] = ""
-                    localeOUT[questID + " completePlayerMessage"] = ""
-
-                    for condition in quest[questID]["conditions"]:
-                        localeOUT[condition] = quest[questID]["conditions"][condition]
+    #Quest Bundles - Change locales from mail + quest and quests.json to new format
+    QuestBundlesOUT =               changeBundles(aqmData["db"]["QuestBundles"])
+    AlternativeBundlesOUT =         changeBundles(aqmData["_AlternativeBundles"])
+    LegacyBundlesOUT =              changeBundles(aqmData["_LegacyBundles"])
+    BarterOnlyQuestBundlesOUT =     changeBundles(aqmData["db"]["BarterOnly"]["QuestBundles"])
 
     #print(QuestBundlesOUT["Ammo Proficiency"]["Bashkir_Temporal_Id"]["locales"]["en.json"], "\n\n")
 
-    localesOUT = {}
-
-    for locale in db["locales"]:
-
-        localesOUT[locale] = {}
-        localesOUT[locale]["trading"] = {}
-
-        for trader in db["locales"][locale]["trading"]:
-
-            localesOUT[locale]["trading"][trader] = {}
-
-            for entry in db["locales"][locale]["trading"][trader]:
-
-                traderIdOnly = trader.replace(".json", "")
-
-                localesOUT[locale]["trading"][trader][traderIdOnly + " " + entry] = db["locales"][locale]["trading"][trader][entry]
+    #Main locales
+    localesOUT = changeLocales(aqmData["db"]["locales"])
 
     databaseOUT = {
-        "locales": localesOUT,
-        "QuestBundles": QuestBundlesOUT
+        "_AlternativeBundles": AlternativeBundlesOUT,
+        "_LegacyBundles": LegacyBundlesOUT,
+        "db": {
+            "locales": localesOUT,
+            "QuestBundles": QuestBundlesOUT,
+            "BarterOnly": {
+                "QuestBundles": BarterOnlyQuestBundlesOUT,
+                "TradersAssort": aqmData["db"]["BarterOnly"]["TradersAssort"]
+            }
+        }
     }
 
     outputDatabase(databaseOUT, "D:\\Desktop\\output\\", True)
@@ -143,13 +98,94 @@ def getDatabase(directory):
 
         if os.path.isfile(fullPath):
 
-            temp_file = open(fullPath, encoding='utf-8')
-            database[entry] = json.load(temp_file)
-            temp_file.close()
+            if fullPath.endswith(".json"):
+
+                temp_file = open(fullPath, encoding='utf-8')
+                database[entry] = json.load(temp_file)
+                temp_file.close()
+            
+            else: continue
 
         else: database[entry] = getDatabase(fullPath)
     
     return database
+
+def changeBundles(bundlesIN):
+
+    bundlesOUT = {}
+
+    for bundle in bundlesIN:
+
+        bundlesOUT[bundle] = {}
+
+        for trader in bundlesIN[bundle]:
+
+            bundlesOUT[bundle][trader] = {}
+            bundlesOUT[bundle][trader]["locales"] = {}
+            bundlesOUT[bundle][trader]["quests.json"] = bundlesIN[bundle][trader]["quests.json"]
+
+            quests = bundlesOUT[bundle][trader]["quests.json"]
+            for quest in quests:
+                quests[quest]["QuestName"] = bundlesIN[bundle][trader]["locales"]["en"]["quest.json"][quest]["name"]
+                quests[quest]["acceptPlayerMessage"] = quest + " acceptPlayerMessage"
+                quests[quest]["changeQuestMessageText"] = quest + " changeQuestMessageText"
+                quests[quest]["completePlayerMessage"] = quest + " completePlayerMessage"
+                quests[quest]["side"] = "Pmc"
+                quests[quest]["questStatus"] = {}
+                if quests[quest]["location"] == "5714dc342459777137212e0b": quests[quest]["location"] = "any"
+
+                AvailableForFinish = quests[quest]["conditions"]["AvailableForFinish"]
+                AvailableForStart = quests[quest]["conditions"]["AvailableForStart"]
+                Fail = quests[quest]["conditions"]["Fail"]
+                for condition in AvailableForFinish:
+                    if condition["_parent"] in ["LeaveItemAtLocation", "FindItem", "HandoverItem"]:
+                        condition["_props"]["isEncoded"] = False
+
+            for locale in bundlesIN[bundle][trader]["locales"]:
+
+                mail = bundlesIN[bundle][trader]["locales"][locale]["mail.json"]
+                quest = bundlesIN[bundle][trader]["locales"][locale]["quest.json"]
+
+                bundlesOUT[bundle][trader]["locales"][locale + ".json"] = {}
+                localeOUT = bundlesOUT[bundle][trader]["locales"][locale + ".json"]
+
+                for questID in quest:
+
+                    localeOUT[questID + " name"] = quest[questID]["name"]
+                    localeOUT[questID + " note"] = quest[questID]["note"]
+                    localeOUT[questID + " description"] = mail[questID + "_Description"]
+                    localeOUT[questID + " startedMessageText"] = mail[questID + "_Started"]
+                    localeOUT[questID + " failMessageText"] = mail[questID + "_Fail"]
+                    localeOUT[questID + " successMessageText"] = mail[questID + "_Success"]
+                    localeOUT[questID + " acceptPlayerMessage"] = ""
+                    localeOUT[questID + " declinePlayerMessage"] = ""
+                    localeOUT[questID + " completePlayerMessage"] = ""
+
+                    for condition in quest[questID]["conditions"]:
+                        localeOUT[condition] = quest[questID]["conditions"][condition]
+
+    return bundlesOUT
+
+def changeLocales(localesIN):
+
+    localesOUT = {}
+
+    for locale in localesIN:
+
+        localesOUT[locale] = {}
+        localesOUT[locale]["trading"] = {}
+
+        for trader in localesIN[locale]["trading"]:
+
+            localesOUT[locale]["trading"][trader] = {}
+
+            for entry in localesIN[locale]["trading"][trader]:
+
+                traderIdOnly = trader.replace(".json", "")
+
+                localesOUT[locale]["trading"][trader][traderIdOnly + " " + entry] = localesIN[locale]["trading"][trader][entry]
+    
+    return localesOUT
 
 def outputDatabase(database, outputPath, initial=False):
 
@@ -168,22 +204,6 @@ def outputDatabase(database, outputPath, initial=False):
         else:
             os.mkdir(outputPath + entry + "\\")
             outputDatabase(database[entry], outputPath + entry + "\\")
-
-def getAllJsonFiles(directory):
-
-    jsonPaths = []
-    tempFiles = []
-
-    jsonPaths = ["\\" + f for f in os.listdir(directory) if (os.path.isfile(directory + "\\" + f) and f.endswith(".json"))]
-    foldersList = ["\\" + f for f in os.listdir(directory) if os.path.isdir(directory + "\\" + f)]
-
-    if foldersList:
-        for folder in foldersList:
-            tempFiles = getAllJsonFiles(directory + folder)
-            tempFiles = ["\\" + folder + f for f in tempFiles]
-            jsonPaths.extend(tempFiles)
-
-    return jsonPaths
 
 
 if __name__ == '__main__': main()
