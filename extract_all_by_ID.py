@@ -28,9 +28,9 @@ enable = {
         "globals":          True,
         "locales":          True,
         "traders":          True,
-        "oldLocales":       True,
-        "bundles":          True,
-        "copyBundles":      True,
+        "oldLocales":       False,
+        "bundles":          False,
+        "copyBundles":      False,
         "clothing":         False,
         "modCompat":        False,
         "modConflicts":     False
@@ -299,7 +299,7 @@ def getTraders(directory, tradersFolder, itemIDs):
 
                     connectedItems = findConnectedItems(item["_id"], tradersIN[trader]["items"])
 
-                    if connectedItems: 
+                    if connectedItems:
                         tradersOUT[trader]["items"].extend(connectedItems)
                         #print(item, "\n\n", connectedItems, "\n\n")
 
@@ -311,18 +311,22 @@ def getTraders(directory, tradersFolder, itemIDs):
     return tradersOUT
 
 def findConnectedItems(ID, traderItems):
-    
+
     connectedItems = []
     tempItems = []
 
     for item in traderItems:
         if ( item["parentId"] == ID ):
             connectedItems.append(item)
+            #print("Item " + item["_id"] + " is connected to " + item["parentId"])
 
     for item in connectedItems:
-        tempItems = findConnectedItems(item["_id"], traderItems) #Scary spooky recursion
+        tempItems.extend(findConnectedItems(item["_id"], traderItems)) #Scary spooky recursion
+        #print(connectedItems)
 
     connectedItems.extend(tempItems)
+    #print(ID + ": Adding to connectedItems: ", end='')
+    #print(tempItems)
 
     return connectedItems
 
@@ -507,9 +511,12 @@ def getLocales(directory, localesFolder, itemIDs, presetIDs, localeIDs):
             shortName =     ID + " ShortName"
             description =   ID + " Description"
 
-            localesOUT[locale][name] = localesIN[locale][name]
-            localesOUT[locale][shortName] = localesIN[locale][shortName]
-            localesOUT[locale][description] = localesIN[locale][description]
+            try: localesOUT[locale][name] = localesIN[locale][name]
+            except KeyError as error: print(name + " not found in locales")
+            try: localesOUT[locale][shortName] = localesIN[locale][shortName]
+            except KeyError as error: print(shortName + " not found in locales")
+            try: localesOUT[locale][description] = localesIN[locale][description]
+            except KeyError as error: print(description + " not found in locales")
 
         for presetID in presetIDs:
             localesOUT[locale][presetID] = localesIN[locale][presetID]
