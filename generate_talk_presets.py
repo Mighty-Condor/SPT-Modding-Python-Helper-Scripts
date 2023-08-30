@@ -40,7 +40,10 @@ def main():
         "cultistFollowers": {},
         "usec": {},
         "zryachiy": {},
-        "zryachiyFollowers": {}
+        "zryachiyFollowers": {},
+        "arenafighter": {},
+        "arenafighterevent": {},
+        "crazyassault": {}
     }
 
     for botType in defaults:
@@ -55,7 +58,7 @@ def main():
             "MIN_TALK_DELAY":                       999999,
             "MIN_DIST_TO_CLOSE_TALK":               5,
             "MIN_DIST_TO_CLOSE_TALK_SQR":           25,
-            "CHANCE_TO_NOTIFY_ENEMY_GR_100":        0
+            #"CHANCE_TO_NOTIFY_ENEMY_GR_100":        0
         }
 
         presetsOUT[botType]["low"] = {
@@ -68,7 +71,7 @@ def main():
             "MIN_TALK_DELAY":                       min(defaults[botType]["normal"]["MIN_TALK_DELAY"] + 10, 100),
             "MIN_DIST_TO_CLOSE_TALK":               max(defaults[botType]["normal"]["MIN_DIST_TO_CLOSE_TALK"] - 2, 1),
             "MIN_DIST_TO_CLOSE_TALK_SQR":           max((defaults[botType]["normal"]["MIN_DIST_TO_CLOSE_TALK"] - 2)**2, 1),
-            "CHANCE_TO_NOTIFY_ENEMY_GR_100":        max(defaults[botType]["normal"]["CHANCE_TO_NOTIFY_ENEMY_GR_100"] - 50, 0)
+            #"CHANCE_TO_NOTIFY_ENEMY_GR_100":        max(defaults[botType]["normal"]["CHANCE_TO_NOTIFY_ENEMY_GR_100"] - 50, 0)
         }
 
         presetsOUT[botType]["normal"] = {

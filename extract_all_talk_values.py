@@ -76,8 +76,8 @@ def main():
             if "MIN_DIST_TO_CLOSE_TALK_SQR" in patrol: finalDict[bot_type][difficulty]["MIN_DIST_TO_CLOSE_TALK_SQR"] = patrol["MIN_DIST_TO_CLOSE_TALK_SQR"]
             else: finalDict[bot_type][difficulty]["MIN_DIST_TO_CLOSE_TALK_SQR"] = None
 
-            if "CHANCE_TO_NOTIFY_ENEMY_GR_100" in grenade: finalDict[bot_type][difficulty]["CHANCE_TO_NOTIFY_ENEMY_GR_100"] = grenade["CHANCE_TO_NOTIFY_ENEMY_GR_100"]
-            else: finalDict[bot_type][difficulty]["CHANCE_TO_NOTIFY_ENEMY_GR_100"] = None     
+            #if "CHANCE_TO_NOTIFY_ENEMY_GR_100" in grenade: finalDict[bot_type][difficulty]["CHANCE_TO_NOTIFY_ENEMY_GR_100"] = grenade["CHANCE_TO_NOTIFY_ENEMY_GR_100"]
+            #else: finalDict[bot_type][difficulty]["CHANCE_TO_NOTIFY_ENEMY_GR_100"] = None     
 
             if "CHANCE_TO_PLAY_VOICE_WHEN_CLOSE" in patrol: finalDict[bot_type][difficulty]["CHANCE_TO_PLAY_VOICE_WHEN_CLOSE"] = patrol["CHANCE_TO_PLAY_VOICE_WHEN_CLOSE"]
             else: finalDict[bot_type][difficulty]["CHANCE_TO_PLAY_VOICE_WHEN_CLOSE"] = 50 
@@ -151,7 +151,10 @@ def translate(filename):
         "pmcbot.json":                  "raiders",
         "exusec.json":                  "rogues",
         "bosszryachiy.json":            "zryachiy",
-        "followerzryachiy.json":        "zryachiyFollowers"
+        "followerzryachiy.json":        "zryachiyFollowers",
+        "arenafighter.json":            "arenafighter",
+        "arenafighterevent.json":       "arenafighterevent",
+        "crazyassaultevent.json":       "crazyassault"
     }
 
     if filename in translationDict: return translationDict[filename]
