@@ -1,6 +1,7 @@
 import json
 import os
 
+
 def main():
 
     print("\n\n")
@@ -26,8 +27,8 @@ def main():
     for key in mod_items:
         all_mod_keys.append(key)
 
-    print(all_item_keys)
-    print(all_mod_keys)
+    #print(all_item_keys)
+    #print(all_mod_keys)
 
     difference = []
 

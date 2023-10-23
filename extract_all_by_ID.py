@@ -24,16 +24,16 @@ import shutil
 
 enable = {
         "items":            True,
-        "handbook":         True,
-        "globals":          True,
-        "locales":          True,
-        "traders":          True,
+        "handbook":         False,
+        "globals":          False,
+        "locales":          False,
+        "traders":          False,
         "oldLocales":       False,
         "bundles":          False,
         "copyBundles":      False,
         "clothing":         False,
-        "modCompat":        False,
-        "modConflicts":     False
+        "modCompat":        True,
+        "modConflicts":     True
     }
 
 def main():

@@ -14,7 +14,7 @@ import json
 import os
 import shutil
 
-stringToFind = "5e81ebcd8e146c7080625e15"
+stringToFind = "WEAPON_SKILL_REPAIR_GAIN"
 
 def main():
 
